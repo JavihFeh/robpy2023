@@ -86,10 +86,10 @@ def produto_vetorial(v1: np.ndarray, v2: np.ndarray) -> np.ndarray:
 
 
 def plota_vetor3(v: np.ndarray,
-                 ax: plot.Axes,
                  *args,
                  vo: np.ndarray = np.zeros([3, 1]),
-                 zdir='z', **kwargs) -> list:
+                 color: strb
+                 **kwargs) -> list:
     """
     Utiliza o pacote matplotlib.plotpy para plotar um vetor em um diagrama 3D. É necessário utilizar eixos criados com o
     comando matplotlib.plotly.axis(projection='3d').
@@ -99,7 +99,6 @@ def plota_vetor3(v: np.ndarray,
     :param args: parâmetros padrão do plot
     :param vo: vetor que vai da origem do sistema de coordenadas até a base do vetor a ser plotado. É [0, 0, 0].T por
     padrão.
-    :param zdir: parâmetro padrão do plot.
     :param kwargs: parâmetros padrão do plot.
     :return: lista de elementos de linha do vetor plotado.
     """
