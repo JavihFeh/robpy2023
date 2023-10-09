@@ -245,7 +245,10 @@ def cria_operador4(m_rot_b_a: np.ndarray = np.eye(3), v_o_a: np.ndarray = np.zer
     :param det_tol:
     :return:
     """
-    pass
+    checa_matriz_rotacao(m_rot_b_a)
+    checa_vetor3(v_o_a)
+
+    T = np.append
 
 
 def constroi_vetor(v_b: np.ndarray,
@@ -276,10 +279,17 @@ def __distancia_entre_retas_np(po1: np.ndarray, vs1: np.ndarray, po2: np.ndarray
     :param po1: Vetor posição de um ponto de referência na reta 1
     :param vs1: Vetor orientação da reta 1
     :param po2: Vetor posição de um ponto de referência na reta 2
-    :param vs2: Vetor orientação da reta 1
+    :param vs2: Vetor orientação da reta 2
     :return: distância entre as retas (float, positivo ou nulo)
     """
-    pass
+    checa_vetor3(po1)
+    checa_vetor3(po2)
+    checa_vetor3(vs1)
+    checa_vetor3(vs2)
+    v1 = po1 - po2
+    v2 = produto_vetorial(vs1, vs2)
+    v2 = v2/norma_vetor(v2)
+    return norma_vetor(proj_vetores(v1, v2))
 
 
 def __distancia_entre_retas_p(po1: np.ndarray, po2: np.ndarray, vs: np.ndarray) -> float:
@@ -293,7 +303,12 @@ def __distancia_entre_retas_p(po1: np.ndarray, po2: np.ndarray, vs: np.ndarray) 
     :param vs: Vetor direção de ambas as retas
     :return: distância entre as retas (float, não negativo)
     """
-    pass
+    checa_vetor3(po1)
+    checa_vetor3(po2)
+    checa_vetor3(vs)
+
+    v1 = po1 - po2
+    return norma_vetor(v1 - proj_vetores(v1, vs))
 
 
 def distancia_entre_retas(po1: np.ndarray, vs1: np.ndarray, po2: np.ndarray, vs2: np.ndarray, angtol=1e-3) -> float:
@@ -307,7 +322,15 @@ def distancia_entre_retas(po1: np.ndarray, vs1: np.ndarray, po2: np.ndarray, vs2
     :param angtol: Tolerância de ângulo entre as retas para decidir se são paralelas
     :return: Distância entre as retas (float, positivo ou nulo)
     """
-    pass
+
+    if angtol < 0:
+        raise ValueError("O valor de tolerância angular não pode ser negativo")
+    ang = np.abs(ang_vetores(vs1, vs2))
+
+    if (ang < angtol) or (np.abs(np.pi-ang)<angtol):
+        return __distancia_entre_retas_p(po1, po2, vs1)
+    else:
+        return __distancia_entre_retas_np(po1, po2, vs1, vs2)
 
 
 def __eixo_reta_12_np(po1: np.ndarray, vs1: np.ndarray, po2: np.ndarray, vs2: np.ndarray) -> float:
