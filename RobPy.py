@@ -5,13 +5,15 @@ import matplotlib.pyplot as plot
 # Parte 1
 
 
-def cria_vetor3(vlist: list) -> np.ndarray:
+def cria_vetor3(vlist: list[float]) -> np.ndarray:
     """
     Função que recebe uma lista e cria um vetor (np.ndarray) coluna de 3 elementos
     :param vlist: Lista com as componentes [vx, vy, vz] do vetor desejado
     :return: np.ndarray: vetor (3, 1) com os valores desejados
     """
-    pass
+    if len(vlist) != 3:
+        raise ValueError('A lista deveria ter 3 posições')
+    return np.asarray([vlist]).T
 
 
 def checa_vetor3(v: np.ndarray) -> None:
@@ -20,7 +22,8 @@ def checa_vetor3(v: np.ndarray) -> None:
     :param v:
     :return:
     """
-    pass
+    if v.shape != (3, 1):
+        raise ValueError('O vetor deveria ser 3X1.')
 
 
 def produto_escalar(v1: np.ndarray, v2: np.ndarray) -> float:
@@ -30,7 +33,10 @@ def produto_escalar(v1: np.ndarray, v2: np.ndarray) -> float:
     :param v2: vetor (np.ndarray) coluna de 3 elementos
     :return: escalar: resultado de v1.v2
     """
-    pass
+    checa_vetor3(v1)
+    checa_vetor3(v2)
+    aux = v1.T @ v2
+    return float(aux[0][0])
 
 
 def norma_vetor(v: np.ndarray) -> float:
@@ -39,7 +45,7 @@ def norma_vetor(v: np.ndarray) -> float:
     :param v: vetor (np.ndarray) coluna de 3 elementos
     :return: escalar: norma do vetor
     """
-    pass
+    return np.sqrt(produto_escalar(v, v))
 
 
 def tamanho_proj_vetores(v1: np.ndarray, v2: np.ndarray) -> float:
@@ -49,7 +55,7 @@ def tamanho_proj_vetores(v1: np.ndarray, v2: np.ndarray) -> float:
     :param v2: vetor (np.ndarray) coluna de 3 elementos
     :return: escalar: tamanho da projeção de v1 sobre v2
     """
-    pass
+    return np.abs(produto_escalar(v1, v2)) / norma_vetor(v2)
 
 
 def proj_vetores(v1: np.ndarray, v2: np.ndarray) -> np.ndarray:
@@ -59,7 +65,7 @@ def proj_vetores(v1: np.ndarray, v2: np.ndarray) -> np.ndarray:
     :param v2: vetor (np.ndarray) coluna de 3 elementos
     :return: vetor (np.ndarray) coluna de 3 elementos com o resultado da projeção
     """
-    pass
+    return (produto_escalar(v1, v2) / produto_escalar(v2, v2)) * v2
 
 
 def ang_vetores(v1: np.ndarray, v2: np.ndarray) -> np.ndarray:
@@ -69,7 +75,8 @@ def ang_vetores(v1: np.ndarray, v2: np.ndarray) -> np.ndarray:
     :param v2: vetor (np.ndarray) coluna de 3 elementos
     :return: escalar: ângulo em radianos
     """
-    pass
+    return np.arccos(produto_escalar(v1, v2) /
+                     (norma_vetor(v1) * norma_vetor(v2)))
 
 
 def produto_vetorial(v1: np.ndarray, v2: np.ndarray) -> np.ndarray:
@@ -79,7 +86,12 @@ def produto_vetorial(v1: np.ndarray, v2: np.ndarray) -> np.ndarray:
     :param v2: vetor (np.ndarray) coluna de 3 elementos
     :return: vetor (np.ndarray) coluna de 3 elementos com o resultado de v1 x v2
     """
-    pass
+    checa_vetor3(v1)
+    checa_vetor3(v2)
+
+    return np.asarray([[v1[1][0] * v2[2][0] - v1[2][0] * v2[1][0]],
+                       [v1[2][0] * v2[0][0] - v1[0][0] * v2[2][0]],
+                       [v1[0][0] * v2[1][0] - v1[1][0] * v2[0][0]]])
 
 
 # Parte 2
@@ -88,21 +100,34 @@ def produto_vetorial(v1: np.ndarray, v2: np.ndarray) -> np.ndarray:
 def plota_vetor3(v: np.ndarray,
                  *args,
                  vo: np.ndarray = np.zeros([3, 1]),
-                 color: strb
+                 color='b',
                  **kwargs) -> list:
     """
     Utiliza o pacote matplotlib.plotpy para plotar um vetor em um diagrama 3D. É necessário utilizar eixos criados com o
     comando matplotlib.plotly.axis(projection='3d').
     Cuidado: os eixos 3d no matplotlib não possuem escala fixa, portanto os gráficos podem parecer distorcidos.
+    :param color:
     :param v: vetor a ser plotado.
-    :param ax: eixos nos quais o vetor será plotado
     :param args: parâmetros padrão do plot
     :param vo: vetor que vai da origem do sistema de coordenadas até a base do vetor a ser plotado. É [0, 0, 0].T por
     padrão.
     :param kwargs: parâmetros padrão do plot.
     :return: lista de elementos de linha do vetor plotado.
     """
-    pass
+
+    a = plot.plot([vo[0][0], v[0][0] + vo[0][0]],
+                  [vo[1][0], v[1][0] + vo[1][0]],
+                  [vo[2][0], v[2][0] + vo[2][0]],
+                  linewidth=4,
+                  color=color)
+    b = plot.plot(v[0][0] + vo[0][0],
+                  v[1][0] + vo[1][0],
+                  v[2][0] + vo[2][0],
+                  marker='>',
+                  markersize=15,
+                  color=color)
+
+    return [a, b]
 
 
 def matriz_rotacao_x(theta: float) -> np.ndarray:
@@ -112,7 +137,12 @@ def matriz_rotacao_x(theta: float) -> np.ndarray:
     :param theta: ângulo de rotação
     :return: matriz de rotação
     """
-    pass
+    s = np.sin(theta)
+    c = np.cos(theta)
+
+    return np.asarray([[1, 0, 0],
+                       [0, c, s],
+                       [0, -s, c]])
 
 
 def matriz_rotacao_y(theta: float) -> np.ndarray:
@@ -122,7 +152,12 @@ def matriz_rotacao_y(theta: float) -> np.ndarray:
     :param theta: ângulo de rotação
     :return: matriz de rotação
     """
-    pass
+    s = np.sin(theta)
+    c = np.cos(theta)
+
+    return np.asarray([[c, 0, -s],
+                       [0, 1, 0],
+                       [s, 0, c]])
 
 
 def matriz_rotacao_z(theta: float) -> np.ndarray:
@@ -132,7 +167,12 @@ def matriz_rotacao_z(theta: float) -> np.ndarray:
     :param theta: ângulo de rotação
     :return: matriz de rotação
     """
-    pass
+    s = np.sin(theta)
+    c = np.cos(theta)
+
+    return np.asarray([[c, s, 0],
+                       [-s, c, 0],
+                       [0, 0, 1]])
 
 
 # Parte 3
@@ -144,7 +184,8 @@ def checa_vetor4(v: np.ndarray) -> None:
     :param v: vetor a verificar
     :return: nenhum.
     """
-    pass
+    if v.shape != (4, 1):
+        raise ValueError('O vetor não é 4X1')
 
 
 def checa_matriz33(m: np.ndarray) -> None:
@@ -153,7 +194,8 @@ def checa_matriz33(m: np.ndarray) -> None:
     :param m: matriz a verificar
     :return: nenhum.
     """
-    pass
+    if m.shape != (3, 3):
+        raise ValueError('A matriz não é 3X3')
 
 
 def checa_matriz44(m: np.ndarray) -> None:
@@ -162,7 +204,8 @@ def checa_matriz44(m: np.ndarray) -> None:
     :param m: matriz a verificar
     :return: nenhum.
     """
-    pass
+    if m.shape != (4, 4):
+        raise ValueError('A matriz não é 4X4')
 
 
 def cria_vetor4(v3: np.ndarray) -> np.ndarray:
@@ -171,7 +214,8 @@ def cria_vetor4(v3: np.ndarray) -> np.ndarray:
     :param v3:
     :return:
     """
-    pass
+    checa_vetor3(v3)
+    return np.append(v3, np.asarray([[1]]), axis=0)
 
 
 def checa_matriz_rotacao(m3: np.ndarray, det_tol: float = 0.01) -> None:
@@ -182,7 +226,13 @@ def checa_matriz_rotacao(m3: np.ndarray, det_tol: float = 0.01) -> None:
     :param det_tol: tolerância do valor do determinante
     :return: não há
     """
-    pass
+    checa_matriz33(m3)
+    erro = np.abs(np.linalg.det(m3)-1)
+    if det_tol < 0:
+        raise ValueError('A tolerância do determinante deve ser um valor não negativo.')
+
+    if erro > det_tol:
+        raise ValueError('Pelo valor do determinante, a matriz não é de rotação.')
 
 
 def cria_operador4(m_rot_b_a: np.ndarray = np.eye(3), v_o_a: np.ndarray = np.zeros([3, 1]), det_tol: float = 0.01) \
@@ -313,7 +363,7 @@ def ang_twist_dir_nc_rad(po1: np.ndarray, vs1: np.ndarray, po2: np.ndarray, vs2:
     pass
 
 
-def ang_twist_dir_ref_rad(vs1: np.ndarray, vs2: np.ndarray, vref: np.ndarray, projtol: float=1e-3) -> float:
+def ang_twist_dir_ref_rad(vs1: np.ndarray, vs2: np.ndarray, vref: np.ndarray, projtol: float = 1e-3) -> float:
     """
     Calcula o ângulo de torção de um link para o caso de eixos concorrentes. Neste caso deve-se passar um eixo de
     referência vref para que se defina o sentido positivo da rotação de torção.
